@@ -10,7 +10,6 @@ logging.basicConfig(
 )
 
 sessionStorage = {}
-dialog_stage = 1
 
 
 @app.route('/post', methods=['POST'])
@@ -25,18 +24,15 @@ def main():
         }
     }
 
-    if dialog_stage == 1:
-        handle_dialog(request.json, response, "слона", False)
-    else:
-        handle_dialog(request.json, response, "кролика", True)
-        dialog_stage = 1
+    handle_dialog(request.json, response)
+
 
     logging.info(f'Response: {response!r}')
     
     return jsonify(response)
 
 
-def handle_dialog(req, resp, product, end_session):
+def handle_dialog(req, resp):
     user_id = req['session']['user_id']
     
     if req['session']['new']:
@@ -47,17 +43,17 @@ def handle_dialog(req, resp, product, end_session):
                 'Отстань!'
             ]
         }
-        resp['response']['text'] = f'Привет! Купи {product}!'
+        resp['response']['text'] = 'Привет! Купи слона!'
         resp['response']['buttons'] = get_suggests(user_id)
         return
     
     for word in ['ладно', 'куплю', 'покупаю', 'хорошо']:
         if word in req['request']['original_utterance'].lower():
-            resp['response']['text'] = f'{product.capitalize()} можно найти на Яндекс.Маркете!'
-            resp['response']['end_session'] = end_session
+            resp['response']['text'] = 'Слона можно найти на Яндекс.Маркете!'
+            resp['response']['end_session'] = True
             return
     
-    resp['response']['text'] = f"Все говорят '{req['request']['original_utterance']}', а ты купи {product}!"
+    resp['response']['text'] = f"Все говорят '{req['request']['original_utterance']}', а ты купи слона!"
     resp['response']['buttons'] = get_suggests(user_id)
 
 
